@@ -1,0 +1,99 @@
+# English translations for AURA Fine Dining
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: en\n"
+
+msgid "Все блюда"
+msgstr "All dishes"
+
+msgid "Ознакомление"
+msgstr "About"
+
+msgid "Часы работы"
+msgstr "Working hours"
+
+msgid "Поиск по блюдам..."
+msgstr "Search dishes..."
+
+msgid "Поиск"
+msgstr "Search"
+
+msgid "Корзина"
+msgstr "Cart"
+
+msgid "Очистить поиск"
+msgstr "Clear search"
+
+msgid "Закрыть поиск"
+msgstr "Close search"
+
+msgid "Меню"
+msgstr "Menu"
+
+msgid "Изысканные блюда для истинных гурманов"
+msgstr "Exquisite dishes for true gourmets"
+
+msgid "Ничего не найдено"
+msgstr "Nothing found"
+
+msgid "Попробуйте другой запрос"
+msgstr "Try a different query"
+
+msgid "Состав"
+msgstr "Ingredients"
+
+msgid "Подробнее"
+msgstr "Details"
+
+msgid "Добавить в корзину"
+msgstr "Add to cart"
+
+msgid "Корзина пока пуста"
+msgstr "Your cart is empty"
+
+msgid "Добавьте блюда из меню"
+msgstr "Add dishes from the menu"
+
+msgid "Итого"
+msgstr "Total"
+
+msgid "сом"
+msgstr "som"
+
+msgid "Оформить заказ"
+msgstr "Place order"
+
+msgid "Продолжить выбор"
+msgstr "Continue selecting"
+
+msgid "Безопасная оплата"
+msgstr "Secure payment"
+
+msgid "К меню"
+msgstr "Back to menu"
+
+msgid "Важная информация"
+msgstr "Important information"
+
+msgid "Штрафы"
+msgstr "Fines"
+
+msgid "Часы работы:"
+msgstr "Working hours:"
+
+msgid "Открыть корзину"
+msgstr "Open cart"
+
+msgid "Закрыть корзину"
+msgstr "Close cart"
+
+msgid "Закрыть"
+msgstr "Close"
+
+msgid "Убавить количество"
+msgstr "Decrease quantity"
+
+msgid "Прибавить количество"
+msgstr "Increase quantity"

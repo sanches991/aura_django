@@ -1,0 +1,15 @@
+/* Highlight the category field so it's impossible to miss */
+.field-category .select2-container {
+    border: 2px solid #f0a500;
+    border-radius: 6px;
+}
+
+.field-category .select2-selection--single {
+    border: none !important;
+    border-radius: 4px;
+}
+
+.field-category > label {
+    font-weight: bold;
+    color: #c07000;
+}

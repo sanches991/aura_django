@@ -1,0 +1,99 @@
+# Kyrgyz translations for AURA Fine Dining
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: ky\n"
+
+msgid "Все блюда"
+msgstr "Бардык тамактар"
+
+msgid "Ознакомление"
+msgstr "Маалымат"
+
+msgid "Часы работы"
+msgstr "Жумуш убактысы"
+
+msgid "Поиск по блюдам..."
+msgstr "Тамактарды издөө..."
+
+msgid "Поиск"
+msgstr "Издөө"
+
+msgid "Корзина"
+msgstr "Себет"
+
+msgid "Очистить поиск"
+msgstr "Издөөнү тазалоо"
+
+msgid "Закрыть поиск"
+msgstr "Издөөнү жабуу"
+
+msgid "Меню"
+msgstr "Меню"
+
+msgid "Изысканные блюда для истинных гурманов"
+msgstr "Чын гурмандар үчүн изделген тамактар"
+
+msgid "Ничего не найдено"
+msgstr "Эч нерсе табылган жок"
+
+msgid "Попробуйте другой запрос"
+msgstr "Башка суроо жазыңыз"
+
+msgid "Состав"
+msgstr "Курамы"
+
+msgid "Подробнее"
+msgstr "Кеңири"
+
+msgid "Добавить в корзину"
+msgstr "Себетке кошуу"
+
+msgid "Корзина пока пуста"
+msgstr "Себет азырынча бош"
+
+msgid "Добавьте блюда из меню"
+msgstr "Менюдан тамактарды кошуңуз"
+
+msgid "Итого"
+msgstr "Жыйынтык"
+
+msgid "сом"
+msgstr "сом"
+
+msgid "Оформить заказ"
+msgstr "Заказ берүү"
+
+msgid "Продолжить выбор"
+msgstr "Тандоону улантуу"
+
+msgid "Безопасная оплата"
+msgstr "Коопсуз төлөм"
+
+msgid "К меню"
+msgstr "Менюга"
+
+msgid "Важная информация"
+msgstr "Маанилүү маалымат"
+
+msgid "Штрафы"
+msgstr "Айыптар"
+
+msgid "Часы работы:"
+msgstr "Жумуш убактысы:"
+
+msgid "Открыть корзину"
+msgstr "Себетти ачуу"
+
+msgid "Закрыть корзину"
+msgstr "Себетти жабуу"
+
+msgid "Закрыть"
+msgstr "Жабуу"
+
+msgid "Убавить количество"
+msgstr "Санды азайтуу"
+
+msgid "Прибавить количество"
+msgstr "Санды көбөйтүү"

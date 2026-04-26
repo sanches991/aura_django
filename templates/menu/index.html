@@ -1,0 +1,387 @@
+{% load static i18n i18n_extras %}{% get_current_language as LANGUAGE_CODE %}{% language 'ru' %}{% url 'menu:index' as lang_url_ru %}{% endlanguage %}{% language 'en' %}{% url 'menu:index' as lang_url_en %}{% endlanguage %}{% language 'ky' %}{% url 'menu:index' as lang_url_ky %}{% endlanguage %}<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE }}">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+<meta name="theme-color" content="#2d5a3d">
+<title>AURA — Fine Dining</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+
+<!-- ================== APP SHELL ================== -->
+<div class="app">
+
+  <!-- ================== SIDEBAR (DESKTOP/TABLET) ================== -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-inner">
+      <!-- Logo -->
+      <a href="{% url 'menu:info' %}" class="logo" aria-label="AURA Fine Dining">
+        <div class="logo-word">AURA</div>
+        <div class="logo-sub">— FINE DINING —</div>
+      </a>
+
+      <!-- Decorative divider -->
+      <div class="nav-sign" aria-hidden="true">
+        <svg viewBox="0 0 40 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round">
+          <path d="M2 12 C 8 4, 14 20, 20 12 S 32 4, 38 12"/>
+        </svg>
+      </div>
+
+      <!-- Category navigation -->
+      <nav class="nav" aria-label="{% trans 'Меню' %}">
+        <button class="nav-item is-active" data-category="all">
+          <span class="nav-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+          </span>
+          <span class="nav-label">{% trans "Все блюда" %}</span>
+        </button>
+
+        {% for cat in categories %}
+        <button class="nav-item" data-category="{{ cat.slug }}">
+          <span class="nav-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">{{ cat.icon_svg|safe }}</svg>
+          </span>
+          <span class="nav-label">{{ cat|get_translated:"name" }}</span>
+          <span class="nav-count">{{ cat.dish_count }}</span>
+        </button>
+        {% endfor %}
+
+        <!-- Кнопка "Ознакомление" — переход на страницу info -->
+        <a href="{% url 'menu:info' %}" class="nav-item nav-item--info">
+          <span class="nav-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg>
+          </span>
+          <span class="nav-label">{% trans "Ознакомление" %}</span>
+        </a>
+      </nav>
+
+      <!-- Working hours -->
+      <div class="hours">
+        <img src="{% static 'images/icon-black.svg' %}" style="color: blackE; width: 40px;margin-bottom: 15px;" alt="">
+
+        <div class="hours-row">
+          <span class="hours-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+          </span>
+          <div class="hours-text">
+            <div class="hours-label">{% trans "Часы работы" %}</div>
+            <div class="hours-time">{{ restaurant_info.hours_open }} — {{ restaurant_info.hours_close }}</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </aside>
+
+  <!-- ================== MOBILE TOP BAR ================== -->
+  <header class="mobile-bar" id="mobileBar">
+    <div class="mobile-logo">
+      <div class="logo-word">AURA</div>
+      <div class="logo-sub">— FINE DINING —</div>
+    </div>
+    <div class="mobile-actions">
+      <!-- Language switcher — mobile -->
+      <div class="lang-switcher lang-switcher--mobile">
+        <div class="lang-buttons">
+          <button type="button" class="lang-btn{% if LANGUAGE_CODE == 'ru' %} is-active{% endif %}" onclick="window.location.href='{{ lang_url_ru }}'">RU</button>
+          <button type="button" class="lang-btn{% if LANGUAGE_CODE == 'en' %} is-active{% endif %}" onclick="window.location.href='{{ lang_url_en }}'">EN</button>
+          <button type="button" class="lang-btn{% if LANGUAGE_CODE == 'ky' %} is-active{% endif %}" onclick="window.location.href='{{ lang_url_ky }}'">KY</button>
+        </div>
+      </div>
+      <button class="mobile-search-btn" id="mobileSearchBtn" aria-label="{% trans 'Поиск' %}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+             stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="7"/><path d="m16.5 16.5 4 4"/>
+        </svg>
+      </button>
+      <button class="mobile-cart-btn" id="mobileCartBtn" aria-label="{% trans 'Корзина' %}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 7h14l-1.5 11a2 2 0 0 1-2 1.7h-7a2 2 0 0 1-2-1.7L5 7Z"/><path d="M9 7V5a3 3 0 0 1 6 0v2"/></svg>
+        <span class="mobile-cart-badge" id="mobileCartBadge">0</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Выдвижная строка поиска под мобильным хедером -->
+  <div class="mobile-search-bar" id="mobileSearchBar" aria-hidden="true">
+    <div class="search-box">
+      <span class="search-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+             stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="7"/><path d="m16.5 16.5 4 4"/>
+        </svg>
+      </span>
+      <input class="search-input" id="mobileSearchInput" type="search"
+             placeholder="{% trans 'Поиск по блюдам...' %}" autocomplete="off" aria-label="{% trans 'Поиск' %}">
+      <button class="search-clear" id="mobileSearchClear" aria-label="{% trans 'Закрыть поиск' %}" hidden>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- ================== MAIN ================== -->
+  <main class="main">
+    <div class="herbs" aria-hidden="true"></div>
+
+    <div class="main-inner">
+      <header class="main-head">
+        <div class="title-block">
+          <h1 class="title">{% trans "Меню" %}</h1>
+          <div class="title-flourish" aria-hidden="true">
+            <img width="50px" height="30px" src="{% static 'images/icon.svg' %}" alt="">
+            <hr>
+          </div>
+          <p class="subtitle">{% trans "Изысканные блюда для истинных гурманов" %}</p>
+        </div>
+
+        <div class="main-head-right">
+          <div class="head-search">
+            <div class="search-box">
+              <span class="search-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                     stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="11" cy="11" r="7"/><path d="m16.5 16.5 4 4"/>
+                </svg>
+              </span>
+              <input class="search-input" id="searchInput" type="search"
+                     placeholder="{% trans 'Поиск по блюдам...' %}" autocomplete="off" aria-label="{% trans 'Поиск по блюдам...' %}">
+              <button class="search-clear" id="searchClear" aria-label="{% trans 'Очистить поиск' %}" hidden>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                     stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="lang-cart-group">
+            <!-- Desktop: inline buttons -->
+            <div class="lang-switcher lang-switcher--header">
+              <div class="lang-buttons">
+                <button type="button" class="lang-btn{% if LANGUAGE_CODE == 'ru' %} is-active{% endif %}" onclick="window.location.href='{{ lang_url_ru }}'">RU</button>
+                <button type="button" class="lang-btn{% if LANGUAGE_CODE == 'en' %} is-active{% endif %}" onclick="window.location.href='{{ lang_url_en }}'">EN</button>
+                <button type="button" class="lang-btn{% if LANGUAGE_CODE == 'ky' %} is-active{% endif %}" onclick="window.location.href='{{ lang_url_ky }}'">KY</button>
+              </div>
+            </div>
+
+            <!-- Tablet: dropdown -->
+            <div class="lang-dropdown" id="langDropdown">
+              <button class="lang-dropdown-btn" id="langDropdownBtn" aria-haspopup="true" aria-expanded="false">
+                <span>{{ LANGUAGE_CODE|upper }}</span>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="lang-dropdown-chevron"><path d="M6 9l6 6 6-6"/></svg>
+              </button>
+              <div class="lang-dropdown-menu" id="langDropdownMenu">
+                <button class="lang-dropdown-item{% if LANGUAGE_CODE == 'ru' %} is-active{% endif %}" onclick="window.location.href='{{ lang_url_ru }}'">RU</button>
+                <button class="lang-dropdown-item{% if LANGUAGE_CODE == 'en' %} is-active{% endif %}" onclick="window.location.href='{{ lang_url_en }}'">EN</button>
+                <button class="lang-dropdown-item{% if LANGUAGE_CODE == 'ky' %} is-active{% endif %}" onclick="window.location.href='{{ lang_url_ky }}'">KY</button>
+              </div>
+            </div>
+
+            <button class="cart-pill" id="cartPill" aria-label="{% trans 'Открыть корзину' %}">
+              <span class="cart-pill-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 7h14l-1.5 11a2 2 0 0 1-2 1.7h-7a2 2 0 0 1-2-1.7L5 7Z"/><path d="M9 7V5a3 3 0 0 1 6 0v2"/></svg>
+              </span>
+              <span class="cart-pill-label">{% trans "Корзина" %}</span>
+              <span class="cart-pill-badge" id="cartPillBadge">0</span>
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <!-- Horizontal category bar (mobile fixed) -->
+      <div class="cat-bar">
+        <nav class="cat-scroll" aria-label="{% trans 'Меню' %}">
+          <button class="cat-chip is-active" data-category="all">{% trans "Все блюда" %}</button>
+          {% for cat in categories %}
+            <button class="cat-chip" data-category="{{ cat.slug }}">{{ cat|get_translated:"name" }}</button>
+          {% endfor %}
+          <a href="{% url 'menu:info' %}" class="cat-chip cat-chip--info">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                 stroke-linecap="round" stroke-linejoin="round" width="13" height="13">
+              <circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/>
+            </svg>
+            {% trans "Ознакомление" %}
+          </a>
+        </nav>
+      </div>
+
+      <!-- =========================================================
+           DISH GRID
+           ========================================================= -->
+      <section class="grid grid--sections" id="dishGrid">
+
+        <!-- Пустое состояние для поиска без результатов -->
+        <div class="grid-empty" id="gridEmpty" hidden>
+          <div class="grid-empty-icon">
+            <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.3"
+                 stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="22" cy="22" r="14"/><path d="m32 32 10 10"/>
+              <path d="M18 22h8M22 18v8" opacity=".4"/>
+            </svg>
+          </div>
+          <p>{% trans "Ничего не найдено" %}</p>
+          <span>{% trans "Попробуйте другой запрос" %}</span>
+        </div>
+
+        {% for cat in categories %}
+        <div class="dish-section" data-category="{{ cat.slug }}">
+          <div class="dish-section-head">
+            <span class="dish-section-line"></span>
+            <h2 class="dish-section-title">{{ cat|get_translated:"name" }}</h2>
+            <span class="dish-section-line"></span>
+          </div>
+          <div class="dish-section-grid">
+
+            {% for dish in cat.dishes.all %}
+            <article class="card"
+                     data-id="{{ dish.slug }}"
+                     data-category="{{ cat.slug }}"
+                     data-price="{{ dish.price }}"
+                     style="animation-delay:{% widthratio forloop.counter0 1 55 %}ms">
+              <div class="card-media">
+                {% if dish.image %}
+                  <img src="{{ dish.image.url }}" alt="{{ dish|get_translated:'name' }}" loading="lazy">
+                {% else %}
+                  <img src="{{ dish.image_url }}" alt="{{ dish|get_translated:'name' }}" loading="lazy">
+                {% endif %}
+              </div>
+              <div class="card-body">
+                <h3 class="card-name">{{ dish|get_translated:"name" }}</h3>
+                <p class="card-desc">{{ dish|get_translated:"description" }}</p>
+                <div class="card-foot">
+                  <div class="card-price">{{ dish.price }} <em>{% trans "сом" %}</em></div>
+                  <div class="card-foot-actions">
+                    <button class="card-more" data-id="{{ dish.slug }}" aria-label="Подробнее о {{ dish|get_translated:'name' }}">
+                      {% trans "Подробнее" %}
+                    </button>
+                    <div class="card-qty-ctrl" id="qty-ctrl-{{ dish.slug }}">
+                      <button class="card-qty-dec" data-id="{{ dish.slug }}" aria-label="{% trans 'Убавить количество' %}">−</button>
+                      <span class="card-qty-num" id="qty-num-{{ dish.slug }}">0</span>
+                      <button class="card-qty-inc" data-id="{{ dish.slug }}" aria-label="{% trans 'Прибавить количество' %}">+</button>
+                    </div>
+                    <button class="card-add" data-id="{{ dish.slug }}" aria-label="Добавить {{ dish|get_translated:'name' }} в корзину">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <!-- Состав (скрытый список для модального окна) -->
+              <ul class="card-ingredients-data" hidden>
+                {% for ing in dish.ingredients.all %}
+                  <li>{{ ing|get_translated:"name" }}</li>
+                {% endfor %}
+              </ul>
+            </article>
+            {% endfor %}
+
+          </div>
+        </div>
+        {% endfor %}
+
+      </section>
+    </div>
+  </main>
+</div>
+
+<!-- ================== CART PANEL ================== -->
+<div class="cart-overlay" id="cartOverlay" aria-hidden="true"></div>
+
+<aside class="cart-panel" id="cartPanel" aria-hidden="true" aria-label="{% trans 'Корзина' %}">
+  <header class="cart-head">
+    <h2 class="cart-title">{% trans "Корзина" %}</h2>
+    <button class="cart-close" id="cartClose" aria-label="{% trans 'Закрыть корзину' %}">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+  </header>
+
+  <div class="cart-body" id="cartBody">
+    <div class="cart-empty" id="cartEmpty">
+      <div class="cart-empty-icon" aria-hidden="true">
+        <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M10 14h28l-3 22a4 4 0 0 1-4 3.4H17a4 4 0 0 1-4-3.4L10 14Z"/><path d="M18 14V10a6 6 0 0 1 12 0v4"/></svg>
+      </div>
+      <p>{% trans "Корзина пока пуста" %}</p>
+      <span>{% trans "Добавьте блюда из меню" %}</span>
+    </div>
+  </div>
+
+  <footer class="cart-foot" id="cartFoot" hidden>
+    <div class="cart-total">
+      <span class="cart-total-label">{% trans "Итого" %}</span>
+      <span class="cart-total-value"><span id="cartTotal">0</span> {% trans "сом" %}</span>
+    </div>
+    <button class="btn btn-primary">{% trans "Оформить заказ" %}</button>
+    <button class="btn btn-ghost" id="continueBtn">{% trans "Продолжить выбор" %}</button>
+    <div class="cart-safe">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6l8-3Z"/><path d="M9 12l2 2 4-4"/></svg>
+      <span>{% trans "Безопасная оплата" %}</span>
+    </div>
+  </footer>
+</aside>
+
+<!-- ================== TOAST ================== -->
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<!-- ================== DISH MODAL ================== -->
+<div class="dish-overlay" id="dishOverlay" aria-hidden="true"></div>
+
+<div class="dish-modal" id="dishModal" role="dialog" aria-modal="true"
+     aria-labelledby="dishModalTitle" aria-hidden="true">
+
+  <button class="dish-modal-close" id="dishModalClose" aria-label="{% trans 'Закрыть' %}">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+         stroke-linecap="round" stroke-linejoin="round">
+      <path d="M6 6l12 12M18 6L6 18"/>
+    </svg>
+  </button>
+
+  <div class="dish-modal-img">
+    <img id="dishModalPhoto" src="" alt="" loading="lazy">
+    <div class="dish-modal-cat-badge" id="dishModalCat"></div>
+  </div>
+
+  <div class="dish-modal-body">
+    <h2 class="dish-modal-title" id="dishModalTitle"></h2>
+    <div class="dish-modal-price" id="dishModalPrice"></div>
+    <p class="dish-modal-desc" id="dishModalDesc"></p>
+    <div class="dish-modal-section">
+      <span class="dish-modal-section-label">{% trans "Состав" %}</span>
+      <ul class="dish-modal-ingredients" id="dishModalIngredients"></ul>
+    </div>
+  </div>
+
+  <div class="dish-modal-footer">
+    <button class="btn btn-primary dish-modal-add" id="dishModalAdd">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+           stroke-linecap="round" stroke-linejoin="round">
+        <path d="M5 7h14l-1.5 11a2 2 0 0 1-2 1.7h-7a2 2 0 0 1-2-1.7L5 7Z"/>
+        <path d="M9 7V5a3 3 0 0 1 6 0v2"/>
+      </svg>
+      {% trans "Добавить в корзину" %}
+    </button>
+  </div>
+</div>
+
+<script src="{% static 'js/script.js' %}"></script>
+<script>
+(function(){
+  var btn  = document.getElementById('langDropdownBtn');
+  var menu = document.getElementById('langDropdownMenu');
+  var wrap = document.getElementById('langDropdown');
+  if(!btn || !menu) return;
+  btn.addEventListener('click', function(e){
+    e.stopPropagation();
+    var open = menu.classList.toggle('is-open');
+    btn.setAttribute('aria-expanded', open);
+    wrap.classList.toggle('is-open', open);
+  });
+  document.addEventListener('click', function(){
+    menu.classList.remove('is-open');
+    wrap.classList.remove('is-open');
+    btn.setAttribute('aria-expanded','false');
+  });
+})();
+</script>
+</body>
+</html>
