@@ -2,6 +2,7 @@
 Django settings for aura_project.
 """
 from pathlib import Path
+from decouple import config, Csv
 
 # ============================================================
 # BASE PATHS
@@ -11,11 +12,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # ============================================================
 # SECURITY
 # ============================================================
-SECRET_KEY = 'django-insecure-aura-fine-dining-change-me-in-production'
+SECRET_KEY = config('SECRET_KEY')
 
-DEBUG = True
+DEBUG = config('DEBUG', default=False, cast=bool)
 
-ALLOWED_HOSTS = ['*']  
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='127.0.0.1', cast=Csv())
 
 # ============================================================
 # APPLICATIONS
@@ -52,7 +53,6 @@ ROOT_URLCONF = 'aura_project.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        
         'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -69,14 +69,28 @@ TEMPLATES = [
 WSGI_APPLICATION = 'aura_project.wsgi.application'
 
 # ============================================================
-# DATABASE — SQLite для разработки
+# DATABASE
 # ============================================================
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+_db_engine = config('DB_ENGINE', default='django.db.backends.sqlite3')
+
+if _db_engine == 'django.db.backends.sqlite3':
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': _db_engine,
+            'NAME':     config('DB_NAME'),
+            'USER':     config('DB_USER'),
+            'PASSWORD': config('DB_PASSWORD'),
+            'HOST':     config('DB_HOST', default='localhost'),
+            'PORT':     config('DB_PORT', default='5432'),
+        }
+    }
 
 # ============================================================
 # PASSWORD VALIDATION
@@ -92,7 +106,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # INTERNATIONALIZATION
 # ============================================================
 LANGUAGE_CODE = 'ru'
-TIME_ZONE = 'Asia/Bishkek'
+TIME_ZONE = config('TIME_ZONE', default='Asia/Bishkek')
 USE_I18N = True
 USE_TZ = True
 
@@ -107,18 +121,18 @@ LOCALE_PATHS = [
 ]
 
 # ============================================================
-# STATIC FILES (CSS, JavaScript, Images)
+# STATIC FILES
 # ============================================================
-STATIC_URL = '/static/'
+STATIC_URL = config('STATIC_URL', default='/static/')
 STATICFILES_DIRS = [
     BASE_DIR / 'static',
 ]
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # ============================================================
-# MEDIA FILES (загружаемые через админку картинки)
+# MEDIA FILES
 # ============================================================
-MEDIA_URL = '/media/'
+MEDIA_URL  = config('MEDIA_URL', default='/media/')
 MEDIA_ROOT = BASE_DIR / 'media'
 
 # ============================================================
@@ -182,6 +196,7 @@ JAZZMIN_SETTINGS = {
         "menu.greeting":         "fas fa-language",
         "menu.inforule":         "fas fa-clipboard-list",
         "menu.fine":             "fas fa-exclamation-triangle",
+        "menu.sociallinks":      "fas fa-share-alt",
     },
 
     "default_icon_parents": "fas fa-chevron-circle-right",
@@ -197,36 +212,8 @@ JAZZMIN_SETTINGS = {
         "auth.user": "collapsible",
     },
     "language_chooser": False,
+
+    "custom_css": "admin/css/aura_admin.css",
 }
 
-JAZZMIN_UI_TWEAKS = {
-    "navbar_small_text": False,
-    "footer_small_text": False,
-    "body_small_text": True,
-    "brand_small_text": False,
-    "brand_colour":      "navbar-warning",
-    "accent":            "accent-warning",
-    "navbar":            "navbar-dark",
-    "no_navbar_border":  True,
-    "navbar_fixed":      True,
-    "layout_boxed":      False,
-    "footer_fixed":      False,
-    "sidebar_fixed":     True,
-    "sidebar":                   "sidebar-dark-warning",
-    "sidebar_nav_small_text":    False,
-    "sidebar_disable_expand":    False,
-    "sidebar_nav_child_indent":  True,
-    "sidebar_nav_compact_style": True,
-    "sidebar_nav_legacy_style":  False,
-    "sidebar_nav_flat_style":    False,
-    "theme":            "darkly",
-    "dark_mode_theme":  None,
-    "button_classes": {
-        "primary":   "btn-outline-primary",
-        "secondary": "btn-outline-secondary",
-        "info":      "btn-info",
-        "warning":   "btn-warning",
-        "danger":    "btn-danger",
-        "success":   "btn-success",
-    },
-}
+JAZZMIN_UI_TWEAKS = {}

@@ -9,6 +9,61 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="{% static 'css/style.css' %}">
+<style>
+/* ---- Sidebar footer ---- */
+.sidebar-footer{
+  padding:10px;
+  border-top:1px solid rgba(255,255,255,.08);
+  margin-top:auto;
+}
+.studio-credit{
+  display:inline-flex;
+  flex-direction:column;
+  gap:2px;
+}
+.studio-credit__label{
+  font-size:9.5px;
+  font-weight:500;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  color:#2d5a3d;
+  line-height:1;
+}
+.studio-credit__link{
+  font-size:12px;
+  font-weight:600;
+  color:#2d5a3d;
+  border-bottom: 1px solid #2d5a3d;
+  text-decoration:none;
+  letter-spacing:.01em;
+  transition:color .15s;
+}
+
+
+/* ---- Mobile footer ---- */
+.mobile-studio-footer{ display:none; }
+@media(max-width:900px){
+  .mobile-studio-footer{
+    display:block;
+    padding:12px 16px 20px;
+    text-align:center;
+    background:#fff;
+    border-top:1px solid #e6eae7;
+  }
+  .mobile-studio-footer .studio-credit{
+    align-items:center;
+  }
+  .mobile-studio-footer .studio-credit__label{
+    color:#9ca3af;
+  }
+  .mobile-studio-footer .studio-credit__link{
+    color:#1c3427;
+  }
+  .mobile-studio-footer .studio-credit__link:hover{
+    color:#2d5a3d;
+  }
+}
+</style>
 </head>
 <body>
 
@@ -72,6 +127,15 @@
             <div class="hours-time">{{ restaurant_info.hours_open }} — {{ restaurant_info.hours_close }}</div>
           </div>
         </div>
+      </div>
+
+      <!-- Студия -->
+      <div class="sidebar-footer">
+        <span class="studio-credit">
+          <span class="studio-credit__label">Сайт сделан</span>
+          <a href="https://studio.itrun.kg/" class="studio-credit__link"
+             target="_blank" rel="noopener noreferrer">It Run Studio</a>
+        </span>
       </div>
 
     </div>
@@ -362,6 +426,15 @@
     </button>
   </div>
 </div>
+
+<!-- ====== МОБИЛЬНЫЙ ФУТЕР ====== -->
+<footer class="mobile-studio-footer">
+  <span class="studio-credit">
+    <span class="studio-credit__label">Сайт сделан</span>
+    <a href="https://studio.itrun.kg/" class="studio-credit__link"
+       target="_blank" rel="noopener noreferrer">It Run Studio</a>
+  </span>
+</footer>
 
 <script src="{% static 'js/script.js' %}"></script>
 <script>

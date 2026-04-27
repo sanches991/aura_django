@@ -2,7 +2,7 @@ from django.db.models import Count, Prefetch, Q
 from django.views.generic import TemplateView, View
 from django.shortcuts import render
 
-from .models import Category, Dish, Ingredient, RestaurantInfo, Greeting, InfoRule, Fine
+from .models import Category, Dish, Ingredient, RestaurantInfo, Greeting, InfoRule, Fine, SocialLinks
 
 
 class InfoView(TemplateView):
@@ -15,6 +15,7 @@ class InfoView(TemplateView):
         ctx['greetings'] = Greeting.objects.all()
         ctx['rules'] = InfoRule.objects.all()
         ctx['fines'] = Fine.objects.all()
+        ctx['social_links'] = SocialLinks.get_instance()
         return ctx
 
 
@@ -42,4 +43,5 @@ class MenuView(View):
         return render(request, 'menu/index.html', {
             'categories': categories,
             'restaurant_info': RestaurantInfo.get_instance(),
+            'social_links': SocialLinks.get_instance(),
         })
