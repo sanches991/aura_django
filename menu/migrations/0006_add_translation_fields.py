@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('menu', '0005_seed_demo_menu'),
+        ('menu', '0004_seed_info_data'),
     ]
 
     operations = [

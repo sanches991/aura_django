@@ -4,7 +4,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('menu', '0002_seed_initial_menu'),
+        ('menu', '0001_initial'),
     ]
 
     operations = [
