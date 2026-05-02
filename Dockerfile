@@ -25,6 +25,7 @@ USER root
 
 # Создаем папку логов и даем права appuser
 RUN mkdir -p /app/logs && \
+    touch /app/logs/django.log && \
     chown -R appuser:appgroup /app/logs && \
     chmod -R 775 /app/logs
 
