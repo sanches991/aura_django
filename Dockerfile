@@ -22,15 +22,16 @@ RUN pip install --no-cache-dir -r requirements.txt
 # ─── Исходный код
 COPY --chown=appuser:appgroup . .
 
-# ─── Папка для Gunicorn-логов
-RUN mkdir -p /app/logs && chown -R appuser:appgroup /app/logs
-
-# ─── Сборка статики (переменные нужны только для collectstatic)
+# ─── Сборка статики
 ARG SECRET_KEY=build-dummy-secret-key-not-used-in-prod
 ARG DB_ENGINE=django.db.backends.sqlite3
 ENV SECRET_KEY=${SECRET_KEY} \
     DB_ENGINE=${DB_ENGINE} \
     DJANGO_SETTINGS_MODULE=aura_project.settings
+
+# ХАК: Создаем пустой файл .map, чтобы WhiteNoise не ругался при сборке
+RUN mkdir -p /app/static/vendor/bootstrap/js/ && \
+    touch /app/static/vendor/bootstrap/js/bootstrap.bundle.min.js.map
 
 RUN python manage.py collectstatic --noinput
 
