@@ -46,7 +46,7 @@ CSRF_TRUSTED_ORIGINS = env.list(
     "CSRF_TRUSTED_ORIGINS",
     default=["https://menu.barca.kg"],
 )
-
+WHITENOISE_MANIFEST_STRICT = False
 X_FRAME_OPTIONS = "DENY"
 
 # ─────────────────────────────────────────────────────────────────────────────
