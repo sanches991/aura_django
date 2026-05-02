@@ -1,148 +1,332 @@
 """
-Django settings for aura_project.
+Django settings for aura_project — production-ready.
+Конфигурация через django-environ (.env файл).
 """
+import os
 from pathlib import Path
-from decouple import config, Csv
 
-# ============================================================
+import environ
+
+# ─────────────────────────────────────────────────────────────────────────────
 # BASE PATHS
-# ============================================================
+# ─────────────────────────────────────────────────────────────────────────────
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# ============================================================
+env = environ.Env(
+    DEBUG=(bool, False),
+    ALLOWED_HOSTS=(list, ["127.0.0.1"]),
+    DB_ENGINE=(str, "django.db.backends.sqlite3"),
+    TIME_ZONE=(str, "Asia/Bishkek"),
+)
+
+# Читаем .env из корня проекта (если существует)
+environ.Env.read_env(BASE_DIR / ".env")
+
+# ─────────────────────────────────────────────────────────────────────────────
 # SECURITY
-# ============================================================
-SECRET_KEY = config('SECRET_KEY')
+# ─────────────────────────────────────────────────────────────────────────────
+SECRET_KEY = env("SECRET_KEY")
+DEBUG = env("DEBUG")
+ALLOWED_HOSTS = env.list("ALLOWED_HOSTS")
 
-DEBUG = config('DEBUG', default=False, cast=bool)
+# HTTPS security headers (активируются только в production)
+if not DEBUG:
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+    SECURE_SSL_REDIRECT = True
+    SECURE_HSTS_SECONDS = 31536000        # 1 год
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    SECURE_BROWSER_XSS_FILTER = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
 
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='127.0.0.1', cast=Csv())
+# Домены, с которых принимаются CSRF-запросы (для DRF и форм)
+CSRF_TRUSTED_ORIGINS = env.list(
+    "CSRF_TRUSTED_ORIGINS",
+    default=["https://menu.barca.kg"],
+)
 
-# ============================================================
+X_FRAME_OPTIONS = "DENY"
+
+# ─────────────────────────────────────────────────────────────────────────────
 # APPLICATIONS
-# ============================================================
+# ─────────────────────────────────────────────────────────────────────────────
 INSTALLED_APPS = [
-    'jazzmin',
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
+    "jazzmin",
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+
+    # REST Framework
+    "rest_framework",
 
     # Локальные приложения
-    'menu.apps.MenuConfig',
+    "menu.apps.MenuConfig",
 ]
 
+# ─────────────────────────────────────────────────────────────────────────────
+# MIDDLEWARE
+# ─────────────────────────────────────────────────────────────────────────────
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.locale.LocaleMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "django.middleware.security.SecurityMiddleware",
+    # WhiteNoise сразу после SecurityMiddleware — обрабатывает статику до Django
+    "whitenoise.middleware.WhiteNoiseMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.locale.LocaleMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-ROOT_URLCONF = 'aura_project.urls'
+ROOT_URLCONF = "aura_project.urls"
 
-# ============================================================
+# ─────────────────────────────────────────────────────────────────────────────
 # TEMPLATES
-# ============================================================
+# ─────────────────────────────────────────────────────────────────────────────
 TEMPLATES = [
     {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [BASE_DIR / "templates"],
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.debug",
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
             ],
         },
     },
 ]
 
-WSGI_APPLICATION = 'aura_project.wsgi.application'
+WSGI_APPLICATION = "aura_project.wsgi.application"
 
-# ============================================================
+# ─────────────────────────────────────────────────────────────────────────────
 # DATABASE
-# ============================================================
-_db_engine = config('DB_ENGINE', default='django.db.backends.sqlite3')
+# ─────────────────────────────────────────────────────────────────────────────
+_db_engine = env("DB_ENGINE")
 
-if _db_engine == 'django.db.backends.sqlite3':
+if _db_engine == "django.db.backends.sqlite3":
     DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
         }
     }
 else:
     DATABASES = {
-        'default': {
-            'ENGINE': _db_engine,
-            'NAME':     config('DB_NAME'),
-            'USER':     config('DB_USER'),
-            'PASSWORD': config('DB_PASSWORD'),
-            'HOST':     config('DB_HOST', default='localhost'),
-            'PORT':     config('DB_PORT', default='5432'),
+        "default": {
+            "ENGINE": _db_engine,
+            "NAME": env("DB_NAME"),
+            "USER": env("DB_USER"),
+            "PASSWORD": env("DB_PASSWORD"),
+            "HOST": env("DB_HOST", default="aura-db"),
+            "PORT": env("DB_PORT", default="5432"),
+            "CONN_MAX_AGE": 60,             # persistent connections
+            "OPTIONS": {
+                "connect_timeout": 10,
+            },
         }
     }
 
-# ============================================================
+# ─────────────────────────────────────────────────────────────────────────────
+# CACHE (Redis)
+# ─────────────────────────────────────────────────────────────────────────────
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": env("REDIS_URL", default="redis://aura-redis:6379/0"),
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            "SOCKET_CONNECT_TIMEOUT": 5,
+            "SOCKET_TIMEOUT": 5,
+            "IGNORE_EXCEPTIONS": True,      # сервер не падает при недоступности Redis
+        },
+        "KEY_PREFIX": "aura",
+    }
+}
+
+SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+SESSION_CACHE_ALIAS = "default"
+
+# ─────────────────────────────────────────────────────────────────────────────
 # PASSWORD VALIDATION
-# ============================================================
+# ─────────────────────────────────────────────────────────────────────────────
 AUTH_PASSWORD_VALIDATORS = [
-    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
+    {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
+    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
+    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
+    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 
-# ============================================================
+# ─────────────────────────────────────────────────────────────────────────────
 # INTERNATIONALIZATION
-# ============================================================
-LANGUAGE_CODE = 'ru'
-TIME_ZONE = config('TIME_ZONE', default='Asia/Bishkek')
+# ─────────────────────────────────────────────────────────────────────────────
+LANGUAGE_CODE = "ru"
+TIME_ZONE = env("TIME_ZONE")
 USE_I18N = True
 USE_TZ = True
 
 LANGUAGES = [
-    ('ru', 'Русский'),
-    ('en', 'English'),
-    ('ky', 'Кыргызча'),
+    ("ru", "Русский"),
+    ("en", "English"),
+    ("ky", "Кыргызча"),
 ]
 
-LOCALE_PATHS = [
-    BASE_DIR / 'locale',
-]
+LOCALE_PATHS = [BASE_DIR / "locale"]
 
-# ============================================================
-# STATIC FILES
-# ============================================================
-STATIC_URL = config('STATIC_URL', default='/static/')
-STATICFILES_DIRS = [
-    BASE_DIR / 'static',
-]
-STATIC_ROOT = BASE_DIR / 'staticfiles'
+# ─────────────────────────────────────────────────────────────────────────────
+# STATIC FILES (WhiteNoise)
+# ─────────────────────────────────────────────────────────────────────────────
+STATIC_URL = env("STATIC_URL", default="/static/")
+STATICFILES_DIRS = [BASE_DIR / "static"]
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
-# ============================================================
+# WhiteNoise: Brotli/Gzip сжатие + иммутабельный кэш для хэшированных файлов
+STORAGES = {
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+}
+
+# Браузер кэширует статику 1 год (работает с ManifestStaticFilesStorage)
+WHITENOISE_MAX_AGE = 31536000
+
+# ─────────────────────────────────────────────────────────────────────────────
 # MEDIA FILES
-# ============================================================
-MEDIA_URL  = config('MEDIA_URL', default='/media/')
-MEDIA_ROOT = BASE_DIR / 'media'
+# ─────────────────────────────────────────────────────────────────────────────
+MEDIA_URL = env("MEDIA_URL", default="/media/")
+MEDIA_ROOT = BASE_DIR / "media"
 
-# ============================================================
+# ─────────────────────────────────────────────────────────────────────────────
+# REST FRAMEWORK
+# ─────────────────────────────────────────────────────────────────────────────
+REST_FRAMEWORK = {
+    "DEFAULT_RENDERER_CLASSES": [
+        "rest_framework.renderers.JSONRenderer",
+    ],
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.AllowAny",
+    ],
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.SessionAuthentication",
+    ],
+    "DEFAULT_THROTTLE_CLASSES": [
+        "rest_framework.throttling.AnonRateThrottle",
+        "rest_framework.throttling.UserRateThrottle",
+    ],
+    "DEFAULT_THROTTLE_RATES": {
+        "anon": "120/minute",
+        "user": "300/minute",
+    },
+    # Пагинация по умолчанию
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+    "PAGE_SIZE": 50,
+}
+
+# CORS: разрешаем запросы с поддомена menu.barca.kg
+# Установите django-cors-headers если нужен браузерный cross-origin доступ:
+#   pip install django-cors-headers
+# CORS_ALLOWED_ORIGINS = ["https://menu.barca.kg"]
+
+# ─────────────────────────────────────────────────────────────────────────────
+# LOGGING (ротация файлов — не забьёт диск)
+# ─────────────────────────────────────────────────────────────────────────────
+LOGS_DIR = BASE_DIR / "logs"
+LOGS_DIR.mkdir(exist_ok=True)
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+
+    "formatters": {
+        "verbose": {
+            "format": "[{asctime}] {levelname} {name} {process:d} {thread:d} — {message}",
+            "style": "{",
+            "datefmt": "%Y-%m-%d %H:%M:%S",
+        },
+        "simple": {
+            "format": "[{asctime}] {levelname} — {message}",
+            "style": "{",
+        },
+    },
+
+    "filters": {
+        "require_debug_false": {"()": "django.utils.log.RequireDebugFalse"},
+    },
+
+    "handlers": {
+        # Консоль — Docker/systemd перехватывает и ротирует автоматически
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "simple",
+        },
+        # Файл Django-приложения с ротацией (10 MB × 5 файлов = 50 MB max)
+        "django_file": {
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": LOGS_DIR / "django.log",
+            "maxBytes": 10 * 1024 * 1024,  # 10 MB
+            "backupCount": 5,
+            "formatter": "verbose",
+            "encoding": "utf-8",
+        },
+        # Отдельный файл только для ошибок
+        "error_file": {
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": LOGS_DIR / "django_errors.log",
+            "maxBytes": 10 * 1024 * 1024,
+            "backupCount": 5,
+            "formatter": "verbose",
+            "level": "ERROR",
+            "encoding": "utf-8",
+        },
+    },
+
+    "loggers": {
+        # Корневой логгер Django
+        "django": {
+            "handlers": ["console", "django_file", "error_file"],
+            "level": "INFO",
+            "propagate": False,
+        },
+        # Запросы (access log уровня INFO)
+        "django.request": {
+            "handlers": ["console", "error_file"],
+            "level": "WARNING",
+            "propagate": False,
+        },
+        # Security
+        "django.security": {
+            "handlers": ["error_file"],
+            "level": "ERROR",
+            "propagate": False,
+        },
+        # Логи приложений проекта
+        "menu": {
+            "handlers": ["console", "django_file"],
+            "level": "DEBUG" if DEBUG else "INFO",
+            "propagate": False,
+        },
+    },
+}
+
+# ─────────────────────────────────────────────────────────────────────────────
 # DEFAULT PRIMARY KEY FIELD TYPE
-# ============================================================
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+# ─────────────────────────────────────────────────────────────────────────────
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# ============================================================
+# ─────────────────────────────────────────────────────────────────────────────
 # JAZZMIN — оформление Django Admin
-# ============================================================
+# ─────────────────────────────────────────────────────────────────────────────
 JAZZMIN_SETTINGS = {
     "site_title": "AURA Admin",
     "site_header": "AURA Fine Dining",
@@ -203,7 +387,6 @@ JAZZMIN_SETTINGS = {
     "default_icon_children": "fas fa-circle",
 
     "related_modal_active": True,
-
     "use_google_fonts_cdn": True,
     "show_ui_builder": False,
 

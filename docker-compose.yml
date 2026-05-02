@@ -1,0 +1,97 @@
+# =============================================================================
+# AURA — Docker Compose
+# Все ресурсы имеют уникальный префикс "aura-" для изоляции от других проектов
+# Целевая директория на сервере: /srv/aura/
+# =============================================================================
+
+name: aura  # compose project name → все сервисы получат префикс "aura-"
+
+services:
+
+  # ─────────────────────────────────────────────────────────────────────────
+  # 1. PostgreSQL 16
+  # ─────────────────────────────────────────────────────────────────────────
+  aura-db:
+    image: postgres:16-alpine
+    container_name: aura-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB:       ${DB_NAME}
+      POSTGRES_USER:     ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - aura-postgres-data:/var/lib/postgresql/data
+    networks:
+      - aura-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ─────────────────────────────────────────────────────────────────────────
+  # 2. Redis 7 (кэш)
+  # ─────────────────────────────────────────────────────────────────────────
+  aura-redis:
+    image: redis:7-alpine
+    container_name: aura-redis
+    restart: unless-stopped
+    command: redis-server --maxmemory 256mb --maxmemory-policy allkeys-lru
+    networks:
+      - aura-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  # ─────────────────────────────────────────────────────────────────────────
+  # 3. Django + Gunicorn
+  # ─────────────────────────────────────────────────────────────────────────
+  aura-web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: aura-web
+    restart: unless-stopped
+    env_file: .env
+    # Порт 8001 на хосте → 8000 внутри контейнера.
+    # Хостовый Nginx проксирует именно на 127.0.0.1:8001
+    ports:
+      - "127.0.0.1:8001:8000"
+    volumes:
+      - aura-static-files:/app/staticfiles
+      - aura-media-files:/app/media
+      - aura-logs:/app/logs
+    networks:
+      - aura-network
+    depends_on:
+      aura-db:
+        condition: service_healthy
+      aura-redis:
+        condition: service_healthy
+    # Применяем миграции автоматически при старте
+    command: >
+      sh -c "python manage.py migrate --noinput &&
+             gunicorn aura_project.wsgi:application --config gunicorn.conf.py"
+
+# =============================================================================
+# Именованные тома (изолированы от томов других проектов)
+# =============================================================================
+volumes:
+  aura-postgres-data:
+    name: aura-postgres-data
+  aura-static-files:
+    name: aura-static-files
+  aura-media-files:
+    name: aura-media-files
+  aura-logs:
+    name: aura-logs
+
+# =============================================================================
+# Изолированная сеть
+# =============================================================================
+networks:
+  aura-network:
+    name: aura-network
+    driver: bridge
