@@ -72,8 +72,8 @@ services:
         condition: service_healthy
     # Применяем миграции автоматически при старте
     command: >
-      sh -c "python manage.py migrate --noinput &&
-             gunicorn aura_project.wsgi:application --config gunicorn.conf.py"
+      sh -c 'python manage.py migrate --noinput &&
+             gunicorn aura_project.wsgi:application --config gunicorn.conf.py'
 
 # =============================================================================
 # Именованные тома (изолированы от томов других проектов)
