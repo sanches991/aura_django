@@ -21,14 +21,18 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY --chown=appuser:appgroup . .
 
 # Переключаемся на root, чтобы создать системные папки и выставить права
+# После COPY --chown=appuser:appgroup . .
+
 USER root
 
-# Создаем папку логов и даем права appuser
-RUN mkdir -p /app/logs && \
-    touch /app/logs/django.log && \
-    chown -R appuser:appgroup /app/logs && \
-    chmod -R 775 /app/logs
+# Создаём все нужные директории и файлы логов
+RUN mkdir -p /app/logs /app/staticfiles /app/media \
+    && touch /app/logs/django.log \
+    && touch /app/logs/django_errors.log \
+    && chown -R appuser:appgroup /app \
+    && chmod -R 775 /app/logs
 
+USER appuser
 # ХАК: Создаем пустой файл .map для статики
 RUN mkdir -p /app/static/vendor/bootstrap/js/ && \
     touch /app/static/vendor/bootstrap/js/bootstrap.bundle.min.js.map
