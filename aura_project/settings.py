@@ -244,75 +244,30 @@ REST_FRAMEWORK = {
 LOGS_DIR = BASE_DIR / "logs"
 LOGS_DIR.mkdir(exist_ok=True)
 
+# ─────────────────────────────────────────────────────────────────────────────
+# LOGGING — только консоль (чтобы контейнер не падал)
+# ─────────────────────────────────────────────────────────────────────────────
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
-
-    "formatters": {
-        "verbose": {
-            "format": "[{asctime}] {levelname} {name} {process:d} {thread:d} — {message}",
-            "style": "{",
-            "datefmt": "%Y-%m-%d %H:%M:%S",
-        },
-        "simple": {
-            "format": "[{asctime}] {levelname} — {message}",
-            "style": "{",
-        },
-    },
-
-    "filters": {
-        "require_debug_false": {"()": "django.utils.log.RequireDebugFalse"},
-    },
-
     "handlers": {
-        # Консоль — Docker/systemd перехватывает и ротирует автоматически
         "console": {
             "class": "logging.StreamHandler",
-            "formatter": "simple",
-        },
-        # Файл Django-приложения с ротацией (10 MB × 5 файлов = 50 MB max)
-        "django_file": {
-            "class": "logging.handlers.RotatingFileHandler",
-            "filename": LOGS_DIR / "django.log",
-            "maxBytes": 10 * 1024 * 1024,  # 10 MB
-            "backupCount": 5,
-            "formatter": "verbose",
-            "encoding": "utf-8",
-        },
-        # Отдельный файл только для ошибок
-        "error_file": {
-            "class": "logging.handlers.RotatingFileHandler",
-            "filename": LOGS_DIR / "django_errors.log",
-            "maxBytes": 10 * 1024 * 1024,
-            "backupCount": 5,
-            "formatter": "verbose",
-            "level": "ERROR",
-            "encoding": "utf-8",
         },
     },
-
     "loggers": {
-        # Корневой логгер Django
         "django": {
-            "handlers": ["console", "django_file", "error_file"],
+            "handlers": ["console"],
             "level": "INFO",
             "propagate": False,
         },
-        # Запросы (access log уровня INFO)
         "django.request": {
-            "handlers": ["console", "error_file"],
+            "handlers": ["console"],
             "level": "WARNING",
             "propagate": False,
         },
-        # Security
-        "django.security": {
-            "handlers": ["error_file"],
-            "level": "ERROR",
-            "propagate": False,
-        },
-        # Логи приложений проекта
         "menu": {
-            "handlers": ["console", "django_file"],
+            "handlers": ["console"],
             "level": "DEBUG" if DEBUG else "INFO",
             "propagate": False,
         },

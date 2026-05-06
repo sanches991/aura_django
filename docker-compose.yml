@@ -60,9 +60,9 @@ services:
     ports:
       - "127.0.0.1:8001:8000"
     volumes:
-      - aura-static-files:/app/staticfiles
-      - aura-media-files:/app/media
-      - aura-logs:/app/logs
+      - ./staticfiles:/app/staticfiles
+      - ./media:/app/media
+      - ./logs:/app/logs
     networks:
       - aura-network
     depends_on:
@@ -81,12 +81,12 @@ services:
 volumes:
   aura-postgres-data:
     name: aura-postgres-data
-  aura-static-files:
-    name: aura-static-files
-  aura-media-files:
-    name: aura-media-files
-  aura-logs:
-    name: aura-logs
+#  aura-static-files:
+#    name: aura-static-files
+#  aura-media-files:
+#    name: aura-media-files
+#  aura-logs:
+#    name: aura-logs
 
 # =============================================================================
 # Изолированная сеть
