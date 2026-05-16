@@ -55,8 +55,6 @@ services:
     container_name: aura-web
     restart: unless-stopped
     env_file: .env
-    # Порт 8001 на хосте → 8000 внутри контейнера.
-    # Хостовый Nginx проксирует именно на 127.0.0.1:8001
     ports:
       - "127.0.0.1:8001:8000"
     volumes:
@@ -70,11 +68,9 @@ services:
         condition: service_healthy
       aura-redis:
         condition: service_healthy
-    # Применяем миграции автоматически при старте
     command: >
       sh -c 'python manage.py migrate --noinput &&
              gunicorn aura_project.wsgi:application --config gunicorn.conf.py'
-
 # =============================================================================
 # Именованные тома (изолированы от томов других проектов)
 # =============================================================================

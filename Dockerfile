@@ -16,37 +16,34 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# ─── 3. ИСХОДНЫЙ КОД И ПРАВА ─────────────────────────────────────────────────
-# Копируем проект
+# ─── 3. ИСХОДНЫЙ КОД ─────────────────────────────────────────────────────────
 COPY --chown=appuser:appgroup . .
 
-# Переключаемся на root, чтобы создать системные папки и выставить права
-# После COPY --chown=appuser:appgroup . .
-
+# ─── 4. ПОДГОТОВКА ПАПОК ─────────────────────────────────────────────────────
 USER root
 
-# Создаём все нужные директории и файлы логов
 RUN mkdir -p /app/logs /app/staticfiles /app/media \
-    && touch /app/logs/django.log \
-    && touch /app/logs/django_errors.log \
     && chown -R appuser:appgroup /app \
-    && chmod -R 775 /app/logs
+    && chmod -R 775 /app/staticfiles /app/media /app/logs
 
-USER appuser
-# ХАК: Создаем пустой файл .map для статики
-RUN mkdir -p /app/static/vendor/bootstrap/js/ && \
-    touch /app/static/vendor/bootstrap/js/bootstrap.bundle.min.js.map
-
-# ─── 4. СБОРКА СТАТИКИ ───────────────────────────────────────────────────────
+# ─── 5. ENV ДЛЯ BUILD ────────────────────────────────────────────────────────
 ARG SECRET_KEY=build-dummy-secret-key
 ARG DB_ENGINE=django.db.backends.sqlite3
+
 ENV SECRET_KEY=${SECRET_KEY} \
     DB_ENGINE=${DB_ENGINE} \
-    DJANGO_SETTINGS_MODULE=aura_project.settings
+    DJANGO_SETTINGS_MODULE=aura_project.settings \
+    PYTHONUNBUFFERED=1
 
-RUN python manage.py collectstatic --noinput
+# ─── 6. 🔥 ФИКС SOURCEMAP (ГЛАВНОЕ) ──────────────────────────────────────────
+# Чистим ВСЕ JS (и в проекте, и в пакетах)
+RUN find /app -name "*.js" -exec sed -i '/sourceMappingURL/d' {} \; \
+ && find /usr/local/lib/python3.12/site-packages -name "*.js" -exec sed -i '/sourceMappingURL/d' {} \;
 
-# ─── 5. ЗАПУСК ───────────────────────────────────────────────────────────────
+# ─── 7. COLLECTSTATIC ────────────────────────────────────────────────────────
+RUN python manage.py collectstatic --noinput --clear
+
+# ─── 8. ПЕРЕКЛЮЧАЕМСЯ НА БЕЗОПАСНОГО ЮЗЕРА ─────────────────────────────────
 USER appuser
 
 EXPOSE 8000
