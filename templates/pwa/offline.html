@@ -1,0 +1,79 @@
+{% load static i18n %}<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#2d5a3d">
+<meta name="robots" content="noindex">
+<title>AURA - Offline</title>
+<link rel="manifest" href="/manifest.json">
+<link rel="icon" href="{% static 'images/pwa/icon-192.png' %}" sizes="192x192">
+<style>
+:root{--green:#2d5a3d;--dark:#14231a;--paper:#fbfaf6;--muted:#5d6b61;}
+*{box-sizing:border-box;}
+html,body{margin:0;min-height:100%;}
+body{
+  min-height:100vh;
+  display:grid;
+  place-items:center;
+  padding:24px;
+  font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+  color:var(--dark);
+  background:linear-gradient(155deg,#0e1b12 0%,#1f3c2c 56%,#172e20 100%);
+}
+.offline-card{
+  width:min(420px,100%);
+  padding:30px 24px;
+  border-radius:18px;
+  background:var(--paper);
+  box-shadow:0 24px 80px rgba(0,0,0,.32);
+  text-align:center;
+}
+.brand{
+  margin:0 0 6px;
+  font-family:Georgia,serif;
+  font-size:38px;
+  font-weight:500;
+  letter-spacing:.22em;
+  color:var(--green);
+}
+.sub{
+  margin:0 0 24px;
+  font-size:10px;
+  letter-spacing:.3em;
+  text-transform:uppercase;
+  color:var(--muted);
+}
+h1{margin:0 0 10px;font-size:22px;line-height:1.2;}
+p{margin:0 0 22px;color:var(--muted);line-height:1.6;font-size:15px;}
+a,button{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-height:44px;
+  padding:0 18px;
+  border:0;
+  border-radius:999px;
+  background:var(--green);
+  color:white;
+  font:600 14px system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+  text-decoration:none;
+  cursor:pointer;
+}
+.actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}
+.ghost{background:#e8f0ea;color:var(--green);}
+</style>
+</head>
+<body>
+  <main class="offline-card">
+    <p class="brand">AURA</p>
+    <p class="sub">Fine Dining</p>
+    <h1>Меню недоступно без интернета</h1>
+    <p>После первого успешного открытия меню приложение сохраняет страницы, стили и изображения для оффлайн-режима.</p>
+    <div class="actions">
+      <a href="/menu/">Открыть меню</a>
+      <button class="ghost" type="button" onclick="window.location.reload()">Повторить</button>
+    </div>
+  </main>
+</body>
+</html>

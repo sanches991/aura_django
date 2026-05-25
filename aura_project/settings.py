@@ -18,6 +18,13 @@ SECRET_KEY = env("SECRET_KEY")
 DEBUG = env("DEBUG")
 ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=["*"])
 CSRF_TRUSTED_ORIGINS = env.list("CSRF_TRUSTED_ORIGINS", default=["https://auracafe.kg", "https://www.auracafe.kg"])
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+SESSION_COOKIE_SECURE = not DEBUG
+CSRF_COOKIE_SECURE = not DEBUG
+SESSION_COOKIE_HTTPONLY = True
+CSRF_COOKIE_HTTPONLY = False
+SECURE_CONTENT_TYPE_NOSNIFF = True
+X_FRAME_OPTIONS = "DENY"
 
 # ==================== APPS ====================
 INSTALLED_APPS = [
@@ -109,6 +116,10 @@ STORAGES = {
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
+
+# Bump this value on every production release that changes templates/static assets
+# so installed PWAs refresh their runtime caches without aggressive invalidation.
+PWA_CACHE_VERSION = env("PWA_CACHE_VERSION", default="2026.05.25.1")
 
 # ==================== LOGGING — только консоль ====================
 LOGGING = {

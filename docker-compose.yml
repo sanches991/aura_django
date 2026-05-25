@@ -69,7 +69,8 @@ services:
       aura-redis:
         condition: service_healthy
     command: >
-      sh -c 'python manage.py migrate --noinput &&
+      sh -c 'python manage.py collectstatic --noinput &&
+             python manage.py migrate --noinput &&
              gunicorn aura_project.wsgi:application --config gunicorn.conf.py'
 # =============================================================================
 # Именованные тома (изолированы от томов других проектов)
