@@ -376,10 +376,10 @@
                     {% if dish.image_srcset %}
                       <source type="image/webp" srcset="{{ dish.image_srcset }}" sizes="(max-width: 720px) 92vw, (max-width: 1100px) 44vw, 31vw">
                     {% endif %}
-                    <img src="{{ dish.image.url }}" alt="{{ dish|get_translated:'name' }}" width="640" height="427" decoding="async"{% if forloop.parentloop.first and forloop.first %} loading="eager" fetchpriority="high"{% else %} loading="lazy"{% endif %}>
+                    <img class="menu-dish-img" data-src="{{ dish.image.url }}" alt="{{ dish|get_translated:'name' }}" width="640" height="427" decoding="async">
                   </picture>
                 {% else %}
-                  <img src="{{ dish.image_url }}" alt="{{ dish|get_translated:'name' }}" width="640" height="427" decoding="async"{% if forloop.parentloop.first and forloop.first %} loading="eager" fetchpriority="high"{% else %} loading="lazy"{% endif %}>
+                  <img class="menu-dish-img" data-src="{{ dish.image_url }}" alt="{{ dish|get_translated:'name' }}" width="640" height="427" decoding="async">
                 {% endif %}
               </div>
               <div class="card-body">
@@ -414,6 +414,18 @@
           </div>
         </div>
         {% endfor %}
+
+        <script>
+        (function () {
+          var lazy = window.matchMedia('(max-width: 720px)').matches;
+          document.querySelectorAll('.menu-dish-img[data-src]').forEach(function (img, i) {
+            img.loading = lazy ? 'lazy' : 'eager';
+            if (!lazy && i === 0) img.fetchPriority = 'high';
+            img.src = img.getAttribute('data-src');
+            img.removeAttribute('data-src');
+          });
+        })();
+        </script>
 
       </section>
     </div>
@@ -472,7 +484,7 @@
   </button>
 
   <div class="dish-modal-img">
-    <img id="dishModalPhoto" src="" alt="" loading="lazy">
+    <img id="dishModalPhoto" src="" alt="">
     <div class="dish-modal-cat-badge" id="dishModalCat"></div>
   </div>
 

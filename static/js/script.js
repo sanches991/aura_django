@@ -17,6 +17,15 @@ const state = {
   cart: {}
 };
 
+/* Телефон <=720px — lazy; планшет/ПК — грузим все фото сразу (как в style.css). */
+function isPhoneViewport() {
+  return window.matchMedia('(max-width: 720px)').matches;
+}
+
+function menuImageLoading() {
+  return isPhoneViewport() ? 'lazy' : 'eager';
+}
+
 /* ---------------------- DOM REFS ---------------------- */
 const $grid        = document.getElementById('dishGrid');
 const $gridEmpty   = document.getElementById('gridEmpty');
@@ -222,7 +231,7 @@ function renderCart(){
     const qty = state.cart[id];
     const itemHtml = `
       <div class="cart-item" data-id="${d.id}">
-        <div class="cart-thumb"><img src="${d.img}" alt="" loading="lazy"></div>
+        <div class="cart-thumb"><img src="${d.img}" alt="" loading="${menuImageLoading()}"></div>
         <div class="cart-info">
           <h4 class="cart-name">${escapeHtml(d.name)}</h4>
           <div class="qty">
@@ -325,6 +334,7 @@ function openDishModal(id) {
 
   /* Заполнить контент из данных карточки */
   const photo = document.getElementById('dishModalPhoto');
+  photo.loading = menuImageLoading();
   photo.src = d.img;
   photo.alt = d.name;
   document.getElementById('dishModalCat').textContent   = catNames[d.cat] || '';
